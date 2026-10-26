@@ -4,9 +4,9 @@
 
 | Ảnh | Nội dung | Trạng thái |
 |---|---|---|
-| 01_repo-moi.png | Trang chủ repo vừa tạo | chưa có |
-| 02_pytest-xanh.png | flake8 + pytest trên máy, coverage 100% | chưa có |
-| 03_app-local.png | App chạy local, thấy `v1.0.0` | chưa có |
+| 01_repo-moi.png | Trang chủ repo vừa tạo | đã có |
+| 02_pytest-xanh.png | flake8 + pytest trên máy, coverage 100% | đã có |
+| 03_app-local.png | App chạy local, thấy `v1.0.0` | đã có |
 | 04_actions-ci-xanh.png | Run CI: Lint → 3 Test xanh | chưa có |
 | 05_ruleset.png | Ruleset `Bao ve main` | chưa có |
 | 06_ci-do.png | Run đỏ (Lint xanh, Test đỏ) | chưa có |
