@@ -50,3 +50,38 @@ jobs:
           name: coverage-report
           path: htmlcov/
           retention-days: 7
+
+  deploy:
+    name: Deploy (Render)
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: ${{ vars.RENDER_APP_URL }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Gọi Render Deploy Hook
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: curl --fail --silent --show-error --max-time 30 -X POST "$RENDER_DEPLOY_HOOK" -o /dev/null
+      - name: Smoke test
+        env:
+          APP_URL: ${{ vars.RENDER_APP_URL }}
+        run: |
+          expected=$(grep -oP 'APP_VERSION = "\K[^"]+' app.py)
+          for i in $(seq 1 40); do
+            actual=$(curl --silent --max-time 20 "$APP_URL/health" | jq -r '.version // empty' || true)
+            echo "Lần $i: mong đợi $expected, nhận được '${actual}'"
+            if [ "$actual" = "$expected" ]; then
+              code=$(curl --silent --max-time 20 -o /dev/null -w '%{http_code}' "$APP_URL/")
+              echo "Trang chủ trả HTTP $code"
+              [ "$code" = "200" ] && exit 0
+              echo "Trang chủ phải trả 200"
+              exit 1
+            fi
+            sleep 15
+          done
+          echo "Hết thời gian chờ: web chưa chạy phiên bản $expected"
+          exit 1
