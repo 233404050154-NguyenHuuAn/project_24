@@ -16,4 +16,5 @@
 | 10_pipeline-deploy-xanh.png | Run có Lint → Test → Deploy xanh | đã có |
 | 11_web-render-v1.png | App trên Render, bản đầu | đã có |
 | 12_web-render-v2.png | App trên Render, sau khi đổi version | đã có |
-| 13_actions-usage.png | Trang Usage/Billing số phút Actions | đã chụp, chưa đưa lên repo (chờ An quyết định có che mã khách hàng trên thanh địa chỉ không) |
+| 13_actions-usage.png | Trang Usage/Billing số phút Actions | đã có |
+| Video 2 đến 3 phút | Sửa version, PR, CI, merge, deploy, web đổi sang `v1.1.0` | đã quay và cắt (file `video_demo_v1.1.0_da_cat.mp4`, 2,1 MB, lưu ngoài repo ở thư mục `Project cuối kỳ`); chưa có link công khai |
