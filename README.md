@@ -3,7 +3,7 @@
 Ứng dụng quản lý công việc hằng ngày (To-do) viết bằng Flask, dùng làm đối tượng để xây dựng quy trình CI/CD bằng GitHub Actions và triển khai lên Render.
 
 - CI: ![CI](https://github.com/233404050154-NguyenHuuAn/project_24/actions/workflows/ci-cd.yml/badge.svg)
-- Ứng dụng: _(link Render sẽ thêm ở giai đoạn CD)_
+- Ứng dụng: https://project-24-x8jl.onrender.com (Render Free, ngủ sau 15 phút không có truy cập, lần mở đầu có thể chờ khoảng một phút)
 
 ## Chạy trên máy (Windows PowerShell)
 
