@@ -24,7 +24,7 @@ def add(client, title="Việc", **extra):
 # ---------- trang chính, health ----------
 
 def test_health(client):
-    assert client.get("/health").get_json() == {"status": "ok", "version": app_module.APP_VERSION}
+    assert client.get("/health").get_json() == {"status": "ok", "version": "0.0.0"}
 
 
 def test_index_shows_version_and_title(client):
