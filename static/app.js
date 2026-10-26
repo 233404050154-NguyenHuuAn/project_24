@@ -38,6 +38,11 @@ function todayStr() {
   return new Date().toLocaleDateString("en-CA", { timeZone: TZ });
 }
 
+// Có chọn giờ mà chưa chọn ngày thì lấy hôm nay (máy chủ yêu cầu giờ phải đi kèm ngày).
+function todayIfTimed(start, end) {
+  return start || end ? todayStr() : null;
+}
+
 function daysBetween(fromStr, toStr) {
   return Math.round((Date.parse(toStr) - Date.parse(fromStr)) / 86400000);
 }
@@ -50,6 +55,11 @@ function dueText(task) {
   if (diff === 1) return { text: "Hạn ngày mai" };
   const [y, m, d] = task.due_date.split("-");
   return { text: `Hạn ${d}/${m}/${y}` };
+}
+
+function timeText(task) {
+  if (!task.start_time) return "";
+  return task.end_time ? `${task.start_time}-${task.end_time}` : task.start_time;
 }
 
 // ---------- gọi API ----------
@@ -110,7 +120,13 @@ function renderTask(task) {
     el("span", { class: `pill ${task.priority}`, text: PRIO_TITLES[task.priority] }),
     el("span", { class: "pill cat", text: CAT_TITLES[task.category] }));
   const due = dueText(task);
-  if (due) meta.append(el("span", { class: due.overdue ? "due overdue" : "due", text: due.text }));
+  if (due) {
+    const when = timeText(task);
+    meta.append(el("span", {
+      class: due.overdue ? "due overdue" : "due",
+      text: when ? `${due.text} · ${when}` : due.text,
+    }));
+  }
 
   const main = el("button", {
     type: "button", class: "task-main", "aria-label": `Sửa: ${task.title}`,
@@ -143,6 +159,10 @@ function renderEdit(task) {
     ...Object.entries(CAT_TITLES).map(([v, l]) => option(v, l, v === task.category)));
   const due = el("input", { type: "date" });
   due.value = task.due_date || "";
+  const start = el("input", { type: "time" });
+  start.value = task.start_time || "";
+  const end = el("input", { type: "time" });
+  end.value = task.end_time || "";
 
   const cancel = () => { state.editingId = null; renderList(lastTasks); };
   const form = el("form", {
@@ -154,7 +174,8 @@ function renderEdit(task) {
           method: "PATCH",
           body: JSON.stringify({
             title: title.value, note: note.value, priority: priority.value,
-            category: category.value, due_date: due.value || null,
+            category: category.value, due_date: due.value || todayIfTimed(start.value, end.value),
+            start_time: start.value || null, end_time: end.value || null,
           }),
         });
         state.editingId = null;
@@ -166,6 +187,7 @@ function renderEdit(task) {
   field("Tiêu đề", title),
   field("Ghi chú", note),
   el("div", { class: "edit-row" }, field("Ưu tiên", priority), field("Nhóm việc", category), field("Hạn chót", due)),
+  el("div", { class: "edit-row" }, field("Giờ bắt đầu", start), field("Giờ kết thúc", end)),
   el("div", { class: "edit-actions" },
     el("button", { class: "btn primary", type: "submit", text: "Lưu" }),
     el("button", { class: "btn", type: "button", text: "Huỷ", onclick: cancel }),
@@ -265,11 +287,15 @@ $("add-form").addEventListener("submit", (e) => {
       method: "POST",
       body: JSON.stringify({
         title: $("add-title").value, priority: $("add-priority").value,
-        category: $("add-category").value, due_date: $("add-due").value || null,
+        category: $("add-category").value,
+        due_date: $("add-due").value || todayIfTimed($("add-start").value, $("add-end").value),
+        start_time: $("add-start").value || null, end_time: $("add-end").value || null,
       }),
     });
     $("add-title").value = "";
     $("add-due").value = "";
+    $("add-start").value = "";
+    $("add-end").value = "";
     await refresh();
     $("add-title").focus();
   });

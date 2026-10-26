@@ -38,6 +38,8 @@ pytest --cov=app --cov=validators --cov-report=term-missing
 | `GET /api/export` | Tải toàn bộ dữ liệu dạng JSON |
 | `POST /api/import` | Nhập lại file đã xuất, thay toàn bộ dữ liệu (tối đa 1 MB) |
 
+Mỗi việc có thể có khung giờ `start_time` và `end_time` (dạng `HH:MM`, tuỳ chọn). Giờ phải đi kèm ngày hạn, giờ kết thúc phải có giờ bắt đầu và phải sau giờ bắt đầu. Việc quá hạn vẫn tính theo ngày.
+
 Lỗi 400, 404, 405, 413 đều trả JSON dạng `{"error": "..."}`. Việc "Hôm nay" gồm việc có hạn hôm nay và việc quá hạn chưa xong. "Hôm nay" tính theo giờ Việt Nam.
 
 ## Hạn chế
