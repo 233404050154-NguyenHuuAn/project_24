@@ -77,9 +77,16 @@ jobs:
             if [ "$actual" = "$expected" ]; then
               code=$(curl --silent --max-time 20 -o /dev/null -w '%{http_code}' "$APP_URL/")
               echo "Trang chủ trả HTTP $code"
-              [ "$code" = "200" ] && exit 0
-              echo "Trang chủ phải trả 200"
-              exit 1
+              [ "$code" = "200" ] || { echo "Trang chủ phải trả 200"; exit 1; }
+              # Mọi file trong <script src> và <link href> cùng máy chủ cũng phải trả 200.
+              assets=$(curl --silent --max-time 20 "$APP_URL/" | grep -oP '<(script|link)\b[^>]*\b(src|href)="\K/[^"]+' || true)
+              [ -n "$assets" ] || { echo "Không tìm thấy file tĩnh nào trong trang chủ"; exit 1; }
+              for path in $assets; do
+                code=$(curl --silent --max-time 20 -o /dev/null -w '%{http_code}' "$APP_URL$path")
+                echo "$path trả HTTP $code"
+                [ "$code" = "200" ] || { echo "File tĩnh $path phải trả 200"; exit 1; }
+              done
+              exit 0
             fi
             sleep 15
           done
