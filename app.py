@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 from flask import Flask, abort, jsonify, render_template, request
 from werkzeug.exceptions import HTTPException
 
-from validators import CATEGORIES, PRIORITIES, validate_task
+from validators import CATEGORIES, PRIORITIES, schedule_error, validate_task
 
 APP_VERSION = "1.0.0"
 VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
@@ -65,8 +65,9 @@ def is_overdue(task):
 
 def sort_key(task):
     due = task["due_date"]
-    return (task["done"], not is_overdue(task), due is None, due or "",
-            PRIORITIES.index(task["priority"]), task["id"])
+    start = task["start_time"]
+    return (task["done"], not is_overdue(task), due is None, due or "", start is None,
+            start or "", PRIORITIES.index(task["priority"]), task["id"])
 
 
 def in_view(task, view):
@@ -142,6 +143,9 @@ def get_task(task_id):
 def update_task(task_id):
     task = get_task_or_404(task_id)
     fields = valid_or_400(get_body(), partial=True)
+    error = schedule_error({**task, **fields})
+    if error:
+        abort(400, error)
     if "done" in fields and fields["done"] != task["done"]:
         task["completed_at"] = now().isoformat(timespec="seconds") if fields["done"] else None
     task.update(fields)

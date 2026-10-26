@@ -45,7 +45,8 @@ def test_script_title_stored_verbatim_and_page_escapes(client):
 def test_create_defaults(client):
     task = add(client, "  Nộp bài  ")
     assert task == {"id": 1, "title": "Nộp bài", "note": "", "priority": "medium",
-                    "category": "work", "due_date": None, "done": False,
+                    "category": "work", "due_date": None, "start_time": None,
+                    "end_time": None, "done": False,
                     "created_at": "2026-10-26T10:00:00+07:00", "completed_at": None}
 
 
@@ -125,6 +126,61 @@ def test_delete(client):
 def test_method_not_allowed_returns_json(client):
     res = client.post("/health")
     assert res.status_code == 405 and res.get_json()["error"]
+
+
+# ---------- khung giờ ----------
+
+def test_create_with_time_range_and_start_only(client):
+    full = add(client, "a", due_date="2026-10-26", start_time="08:00", end_time="09:30")
+    assert (full["start_time"], full["end_time"]) == ("08:00", "09:30")
+    start_only = add(client, "b", due_date="2026-10-26", start_time="14:00", end_time="")
+    assert (start_only["start_time"], start_only["end_time"]) == ("14:00", None)
+
+
+@pytest.mark.parametrize("extra", [
+    {"start_time": "8:00"}, {"start_time": "25:00"}, {"start_time": 800},
+    {"start_time": "0800T"}, {"start_time": "T0800"}, {"end_time": "12:60"},
+])
+def test_create_invalid_time_format(client, extra):
+    res = client.post("/api/tasks", json={"title": "a", "due_date": "2026-10-26", **extra})
+    assert res.status_code == 400
+
+
+@pytest.mark.parametrize("extra", [
+    {"start_time": "08:00"},
+    {"due_date": "2026-10-26", "end_time": "09:00"},
+    {"due_date": "2026-10-26", "start_time": "09:00", "end_time": "09:00"},
+    {"due_date": "2026-10-26", "start_time": "10:00", "end_time": "09:00"},
+])
+def test_create_invalid_schedule(client, extra):
+    res = client.post("/api/tasks", json={"title": "a", **extra})
+    assert res.status_code == 400 and res.get_json()["error"]
+
+
+def test_patch_time_rules(client):
+    task = add(client, "a", due_date="2026-10-26", start_time="08:00", end_time="09:00")
+    url = f"/api/tasks/{task['id']}"
+    res = client.patch(url, json={"due_date": None})
+    assert res.status_code == 400
+    assert client.get(url).get_json() == task
+    assert client.patch(url, json={"start_time": "10:00"}).status_code == 400
+    assert client.patch(url, json={"start_time": None}).status_code == 400
+    res = client.patch(url, json={"start_time": None, "end_time": None, "due_date": None})
+    assert res.status_code == 200 and res.get_json()["start_time"] is None
+
+
+def test_patch_adds_time_to_task_with_date(client):
+    task = add(client, "a", due_date="2026-10-26")
+    res = client.patch(f"/api/tasks/{task['id']}", json={"start_time": "07:30"})
+    assert res.status_code == 200 and res.get_json()["start_time"] == "07:30"
+
+
+def test_sort_by_start_time_within_same_day(client):
+    no_time = add(client, "không giờ", due_date="2026-11-01")
+    late = add(client, "chiều", due_date="2026-11-01", start_time="15:00")
+    early = add(client, "sáng", due_date="2026-11-01", start_time="08:00")
+    next_day = add(client, "hôm sau", due_date="2026-11-02", start_time="06:00")
+    assert ids(client) == [early["id"], late["id"], no_time["id"], next_day["id"]]
 
 
 # ---------- lọc, sắp xếp ----------
@@ -254,6 +310,22 @@ def test_import_replaces_everything_and_fills_missing_timestamps(client):
     assert tasks[0]["created_at"] == tasks[0]["completed_at"] == "2026-10-26T10:00:00+07:00"
     assert tasks[1]["completed_at"] is None
     assert add(client, "tiếp")["id"] == 10
+
+
+def test_import_keeps_time_range(client):
+    add(client, "a", due_date="2026-10-30", start_time="08:00", end_time="09:30")
+    exported = client.get("/api/export").get_json()
+    app_module.reset_store()
+    assert client.post("/api/import", json=exported).status_code == 200
+    task = client.get("/api/tasks/1").get_json()
+    assert (task["start_time"], task["end_time"]) == ("08:00", "09:30")
+
+
+def test_import_invalid_time_changes_nothing(client):
+    keep = add(client, "giữ lại")
+    bad = {"tasks": [{"id": 1, "title": "a", "start_time": "08:00"}]}  # có giờ mà không có ngày
+    assert client.post("/api/import", json=bad).status_code == 400
+    assert ids(client) == [keep["id"]]
 
 
 def test_import_empty_list_resets_counter(client):

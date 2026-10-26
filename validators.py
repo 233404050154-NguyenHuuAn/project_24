@@ -1,5 +1,5 @@
 """Kiểm tra dữ liệu công việc, dùng chung cho POST/PUT/PATCH/import."""
-from datetime import date
+from datetime import date, time
 
 PRIORITIES = ("high", "medium", "low")
 CATEGORIES = ("work", "study", "personal")
@@ -13,6 +13,16 @@ def parse_date(value):
         return None
     try:
         return date.fromisoformat(value)
+    except ValueError:
+        return None
+
+
+def parse_time(value):
+    """Trả về time nếu value đúng HH:MM, ngược lại None."""
+    if not isinstance(value, str) or len(value) != 5 or value[2] != ":":
+        return None
+    try:
+        return time.fromisoformat(value)
     except ValueError:
         return None
 
@@ -58,8 +68,33 @@ def validate_task(data, partial=False):
             return None, "Hạn chót phải có dạng YYYY-MM-DD."
         else:
             out["due_date"] = due
+    for key in ("start_time", "end_time"):
+        if key in data or not partial:
+            value = data.get(key)
+            if value in (None, ""):
+                out[key] = None
+            elif parse_time(value) is None:
+                return None, "Giờ phải có dạng HH:MM (24 giờ)."
+            else:
+                out[key] = value
     if "done" in data:
         if not isinstance(data["done"], bool):
             return None, "Trạng thái done phải là true hoặc false."
         out["done"] = data["done"]
+    if not partial:
+        error = schedule_error(out)
+        if error:
+            return None, error
     return out, None
+
+
+def schedule_error(task):
+    """Kiểm tra quan hệ ngày - giờ trên một bản ghi đầy đủ. Trả về thông báo lỗi hoặc None."""
+    start, end = task["start_time"], task["end_time"]
+    if (start or end) and not task["due_date"]:
+        return "Cần chọn ngày trước khi đặt giờ."
+    if end and not start:
+        return "Cần có giờ bắt đầu trước khi đặt giờ kết thúc."
+    if start and end and end <= start:
+        return "Giờ kết thúc phải sau giờ bắt đầu."
+    return None
