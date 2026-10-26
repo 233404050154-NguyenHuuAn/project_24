@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Việc hằng ngày - Nhóm 3</title>
+  <meta name="color-scheme" content="light dark">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>Nhóm 3 – Đề tài 24</h1>
+        <span class="badge" title="Phiên bản ứng dụng">v{{ version }}</span>
+      </div>
+
+      <nav aria-label="Chế độ xem">
+        <ul class="nav" id="views">
+          <li><button type="button" data-view="today"><span>Hôm nay</span><span class="count" data-count="today">0</span></button></li>
+          <li><button type="button" data-view="upcoming"><span>Sắp tới</span><span class="count" data-count="upcoming">0</span></button></li>
+          <li><button type="button" data-view="overdue"><span>Quá hạn</span><span class="count" data-count="overdue">0</span></button></li>
+          <li><button type="button" data-view="done"><span>Đã xong</span><span class="count" data-count="done">0</span></button></li>
+          <li><button type="button" data-view="all"><span>Tất cả</span><span class="count" data-count="all">0</span></button></li>
+        </ul>
+      </nav>
+
+      <nav aria-label="Nhóm việc">
+        <p class="nav-title">Nhóm việc</p>
+        <ul class="nav" id="cats">
+          <li><button type="button" data-category="work"><span>Công việc</span><span class="count" data-cat-count="work">0</span></button></li>
+          <li><button type="button" data-category="study"><span>Học tập</span><span class="count" data-cat-count="study">0</span></button></li>
+          <li><button type="button" data-category="personal"><span>Cá nhân</span><span class="count" data-cat-count="personal">0</span></button></li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-foot">
+        <p class="nav-title">Sao lưu</p>
+        <a class="btn" href="/api/export" download="todo-export.json">Xuất JSON</a>
+        <button class="btn" type="button" id="import-btn">Nhập JSON</button>
+        <input type="file" id="import-file" accept="application/json,.json" hidden>
+        <p class="hint">Dữ liệu lưu trong bộ nhớ máy chủ và mất khi máy chủ khởi động lại. Hãy xuất file để giữ bản sao.</p>
+      </div>
+    </aside>
+
+    <main>
+      <header class="page-head">
+        <h2 id="view-title">Hôm nay</h2>
+        <p id="view-date"></p>
+      </header>
+
+      <section class="stats" aria-label="Thống kê">
+        <div class="stat">
+          <p class="stat-label">Tiến độ hôm nay</p>
+          <p class="stat-value" id="stat-today">0/0</p>
+          <div class="bar"><span id="bar-today"></span></div>
+        </div>
+        <div class="stat">
+          <p class="stat-label">Hoàn thành tổng</p>
+          <p class="stat-value" id="stat-percent">0%</p>
+          <div class="bar"><span id="bar-percent"></span></div>
+        </div>
+      </section>
+
+      <form class="add" id="add-form" autocomplete="off">
+        <label class="sr-only" for="add-title">Tiêu đề việc mới</label>
+        <input id="add-title" type="text" maxlength="200" placeholder="Thêm việc mới, nhấn Enter để lưu" required>
+        <label class="sr-only" for="add-priority">Ưu tiên</label>
+        <select id="add-priority">
+          <option value="high">Ưu tiên cao</option>
+          <option value="medium" selected>Ưu tiên vừa</option>
+          <option value="low">Ưu tiên thấp</option>
+        </select>
+        <label class="sr-only" for="add-category">Nhóm việc</label>
+        <select id="add-category">
+          <option value="work">Công việc</option>
+          <option value="study">Học tập</option>
+          <option value="personal">Cá nhân</option>
+        </select>
+        <label class="sr-only" for="add-due">Hạn chót</label>
+        <input id="add-due" type="date">
+        <button class="btn primary" type="submit">Thêm</button>
+      </form>
+
+      <div class="filters">
+        <label class="sr-only" for="search">Tìm công việc</label>
+        <input id="search" type="search" placeholder="Tìm theo tiêu đề hoặc ghi chú">
+        <label class="sr-only" for="filter-priority">Lọc theo ưu tiên</label>
+        <select id="filter-priority">
+          <option value="">Mọi mức ưu tiên</option>
+          <option value="high">Cao</option>
+          <option value="medium">Vừa</option>
+          <option value="low">Thấp</option>
+        </select>
+      </div>
+
+      <div id="error" class="error" role="alert" hidden></div>
+      <ul class="tasks" id="list" aria-live="polite">
+        <li class="skeleton"></li><li class="skeleton"></li><li class="skeleton"></li>
+      </ul>
+      <p class="hint shortcuts">Phím tắt: N để thêm việc, / để tìm kiếm, Esc để đóng form sửa.</p>
+    </main>
+  </div>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
