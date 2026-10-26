@@ -11,9 +11,9 @@
 | 05a_ruleset.png, 05b_ruleset.png | Ruleset `Bao ve main` (trang dài nên chụp 2 ảnh: 05a phần đầu, 05b phần còn lại) | đã có |
 | 06_ci-do.png | Run đỏ (Lint xanh, Test đỏ) | đã có |
 | 07_pr-bi-chan.png | PR có check đỏ, nút Merge bị khoá | đã có |
-| 08_render-cau-hinh.png | Render Settings: build/start command, Auto-Deploy Off | chưa có |
-| 09_secrets-variables.png | GitHub Secrets/Variables (chỉ thấy tên) | chưa có |
-| 10_pipeline-deploy-xanh.png | Run có Lint → Test → Deploy xanh | chưa có |
-| 11_web-render-v1.png | App trên Render, bản đầu | chưa có |
-| 12_web-render-v2.png | App trên Render, sau khi đổi version | chưa có |
+| 08a_render-cau-hinh.png, 08b_render-cau-hinh.png | Render Settings: build command, start command, Auto-Deploy Off (Deploy Hook đã che) | đã có |
+| 09a_secrets-variables.png, 09b_secrets-variables.png | GitHub Secrets và Variables (chỉ thấy tên secret) | đã có |
+| 10_pipeline-deploy-xanh.png | Run có Lint → Test → Deploy xanh | đã có |
+| 11_web-render-v1.png | App trên Render, bản đầu | đã có |
+| 12_web-render-v2.png | App trên Render, sau khi đổi version | đã có |
 | 13_actions-usage.png | Trang Usage/Billing số phút Actions | chưa có |
