@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 import pytest
@@ -31,6 +32,15 @@ def test_index_shows_version_and_title(client):
     html = client.get("/").get_data(as_text=True)
     assert f"v{app_module.APP_VERSION}" in html
     assert "Nhóm 3 – Đề tài 24" in html
+
+
+def test_index_static_files_exist(client):
+    # Gõ sai tên file trong <script> hoặc <link> làm giao diện hỏng mà các test khác không thấy.
+    html = client.get("/").get_data(as_text=True)
+    paths = re.findall(r'<(?:script|link)\b[^>]*\b(?:src|href)="(/[^"]+)"', html)
+    assert {"/static/app.js", "/static/style.css"} <= set(paths)
+    for path in paths:
+        assert client.get(path).status_code == 200, path
 
 
 def test_script_title_stored_verbatim_and_page_escapes(client):

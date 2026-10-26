@@ -266,7 +266,14 @@ Chạy lại lỗi `app.jss`, lần này kèm đổi `APP_VERSION` thành `1.1.1
 
 - Pipeline báo đỏ tự động sau merge 2 phút 31,7 giây, không cần ai kiểm tra bằng tay (lần 1: xanh và phát hiện thủ công).
 - Khôi phục bằng revert: **2 phút 27,6 giây** từ lúc mở PR revert, **1 phút 41,6 giây** từ lúc merge. Web hỏng khoảng 3 phút 11 giây đến 3 phút 26 giây.
-- **Giới hạn phải ghi rõ:** smoke test chạy sau khi gọi Deploy Hook nên bản lỗi vẫn lên web. Cải tiến này giúp **phát hiện** nhanh và tự động, chưa **chặn** được bản lỗi. Muốn chặn từ trước khi merge cần thêm một test `pytest` kiểm tra file tĩnh (CI đỏ thì ruleset khoá PR). Nếu version không đổi, smoke test cũng không phân biệt được bản cũ và bản mới, muốn phân biệt cần cho `/health` trả thêm mã commit.
+- **Giới hạn phải ghi rõ:** smoke test chạy sau khi gọi Deploy Hook nên bản lỗi vẫn lên web. Cải tiến này giúp **phát hiện** nhanh và tự động, chưa **chặn** được bản lỗi. Muốn chặn từ trước khi merge cần thêm một test `pytest` kiểm tra file tĩnh (CI đỏ thì ruleset khoá PR); test này đã được thêm, xem mục tiếp theo. Nếu version không đổi, smoke test cũng không phân biệt được bản cũ và bản mới, muốn phân biệt cần cho `/health` trả thêm mã commit.
+
+### Bổ sung: test pytest chặn lỗi file tĩnh trước khi merge
+Để chặn thay vì chỉ phát hiện, thêm `test_index_static_files_exist` vào `tests/test_app.py`: lấy HTML của `/`, lọc mọi URL cùng máy chủ trong `<script src>` và `<link href>`, yêu cầu có `/static/app.js` và `/static/style.css`, rồi gọi từng URL bằng test client và kiểm tra trả 200. Test chạy trong job Test của CI nên nằm trong các check bắt buộc của ruleset.
+
+Kiểm chứng cục bộ: với code đúng, 76 test đạt và coverage vẫn 100%. Khi cố ý đổi `app.js` thành `app.jss` trong `templates/index.html`, chỉ test mới này thất bại (`1 failed, 75 passed`), các test cũ vẫn xanh như trước. Vì CI đỏ khoá nút Merge nhờ ruleset (đã kiểm ở thí nghiệm 1), bản lỗi kiểu này giờ bị chặn trước khi vào `main`. Chuỗi CI đỏ rồi PR bị chặn không chạy lại cho lỗi này, chỉ kiểm cục bộ bước test thất bại.
+
+Smoke test sau deploy vẫn giữ lại làm lớp kiểm tra thứ hai, vì nó kiểm tra bản đang chạy trên Render chứ không phải bản trong CI.
 
 ## Thí nghiệm 5: bảo mật
 
@@ -340,7 +347,6 @@ Trung bình: lần đầu sau khi ngủ **22,6 giây** (hai mẫu), các lần s
 - Hạn chế của Render Free liên hệ trực tiếp với app: dữ liệu lưu trong bộ nhớ nên mất khi deploy, restart hoặc ngủ. Đây là lý do app có nút Xuất/Nhập JSON để sao lưu.
 
 ## Hạn chế và đề xuất cải tiến (chưa làm)
-- Thêm test `pytest` kiểm tra file tĩnh để chặn lỗi như `app.jss` trước khi merge, thay vì chỉ phát hiện sau deploy.
 - Cho `/health` trả thêm mã commit (Render đặt biến `RENDER_GIT_COMMIT`) để smoke test phân biệt được bản cũ và bản mới khi version không đổi.
 - Ghim `ubuntu-24.04` thay cho `ubuntu-latest` (GitHub thông báo `ubuntu-latest` đang chuyển sang Ubuntu 26) và ghim action theo mã SHA.
 - Chuyển Deploy Hook thành secret của environment `production`, giới hạn nhánh `main`.
