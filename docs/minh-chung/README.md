@@ -16,4 +16,4 @@
 | 10_pipeline-deploy-xanh.png | Run có Lint → Test → Deploy xanh | đã có |
 | 11_web-render-v1.png | App trên Render, bản đầu | đã có |
 | 12_web-render-v2.png | App trên Render, sau khi đổi version | đã có |
-| 13_actions-usage.png | Trang Usage/Billing số phút Actions | chưa có |
+| 13_actions-usage.png | Trang Usage/Billing số phút Actions | đã chụp, chưa đưa lên repo (chờ An quyết định có che mã khách hàng trên thanh địa chỉ không) |
