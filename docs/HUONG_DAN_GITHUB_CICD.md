@@ -58,7 +58,7 @@ Gặp lỗi: xem mục 4. Muốn hiểu vì sao làm vậy: đọc mục 5 đế
 | Pipeline | `.github/workflows/ci-cd.yml`: Lint, Test (Python 3.10, 3.11, 3.12), Deploy |
 | Số liệu thí nghiệm | `docs/thi-nghiem.md` |
 | Ảnh minh chứng | `docs/minh-chung/` |
-| Video demo | [CẦN BỔ SUNG: link video An tự upload] |
+| Video demo | [Xem video](https://drive.google.com/file/d/1kUIelZABz_gtzm_IreyU2uQ35SYCu4WR/view?usp=sharing) |
 
 **Vai trò trong nhóm**
 
@@ -602,7 +602,7 @@ flowchart LR
 
 ![Web sau khi đổi version](minh-chung/12_web-render-v2.png)
 
-**Video demo (2 đến 3 phút):** sửa version, PR, CI xanh, merge, deploy, web đổi phiên bản. Quay bằng Xbox Game Bar (`Win+Alt+R`) hoặc OBS. Link: [CẦN BỔ SUNG: link video An tự upload].
+**Video demo (2 đến 3 phút):** sửa version, PR, CI xanh, merge, deploy, web đổi phiên bản. Quay bằng Xbox Game Bar (`Win+Alt+R`) hoặc OBS. Link: https://drive.google.com/file/d/1kUIelZABz_gtzm_IreyU2uQ35SYCu4WR/view?usp=sharing
 
 ## 10. Kịch bản từng thí nghiệm
 
@@ -759,7 +759,7 @@ Lưu vào `docs/minh-chung/`, tên đúng như bảng. Chụp cả thanh địa 
 | `11_web-render-v1.png` | Web trên Render, bản đầu | Chương 3, mục CD | Đã có |
 | `12_web-render-v2.png` | Web trên Render sau khi đổi version | Chương 3, mục CD; chương 4, thí nghiệm 3 | Đã có |
 | `13_actions-usage.png` | Trang Usage của Actions | Chương 4, chi phí | Đã có |
-| Video 2 đến 3 phút | Sửa version, PR, CI, merge, deploy, web đổi phiên bản | Phụ lục báo cáo, demo thuyết trình | Đã quay; [CẦN BỔ SUNG: link] |
+| Video 2 đến 3 phút | Sửa version, PR, CI, merge, deploy, web đổi phiên bản | Phụ lục báo cáo, demo thuyết trình | Đã quay; [xem video](https://drive.google.com/file/d/1kUIelZABz_gtzm_IreyU2uQ35SYCu4WR/view?usp=sharing) |
 
 **Ảnh nên chụp bằng cách nào:** dùng công cụ chụp của Windows (`Win+Shift+S`), chọn vùng gồm cả thanh địa chỉ, lưu thành PNG. Với trang dài (như ruleset), cuộn và chụp thành hai ảnh `a` và `b`. Trước khi đưa ảnh lên repo, mở lại ảnh để chắc không lộ giá trị bí mật.
 
