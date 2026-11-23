@@ -11,7 +11,7 @@ from werkzeug.exceptions import HTTPException
 
 from validators import CATEGORIES, PRIORITIES, schedule_error, validate_task
 
-APP_VERSION = "1.1.1"
+APP_VERSION = "1.1.0"
 VN_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
 VIEWS = ("today", "upcoming", "overdue")
 
